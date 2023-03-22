@@ -16,7 +16,7 @@ function App() {
       Comentarios Importantes en Espanol
     */
     /*
-    En este proyecto, estoy utilizando la libreria de componetes 
+    En este proyecto, estoy utilizando la libreria de componentes 
     Chakra UI que tiene un provider, para lo cual necesito wrappear,
     toda mi app en el provider, y a su ves wrappear Dentro de las,
     rutas de react-router-dom, por lo cual declaro un Layout, donde

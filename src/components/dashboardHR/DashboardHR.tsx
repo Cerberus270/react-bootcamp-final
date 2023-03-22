@@ -38,8 +38,6 @@ const DashboardHR = () => {
   // onSubmit from Form
   const onSubmit = async (data: IApplicationForm) => {
     console.log(data);
-    /*data.starDate = new Date(data.starDate);
-    data.endDate = new Date(data.endDate);*/
     await addNewSick(data) ? toast({
       title: 'Sick Application created.',
       description: 'Your application was saved succefully',
@@ -66,8 +64,8 @@ const DashboardHR = () => {
   useEffect(() => {
     const getData = async () => {
       let tempData: any[] = []
-      const citiesRef = collection(db, "employee");
-      const querySnapshot = await getDocs(citiesRef);
+      const employeeRef = collection(db, "employee");
+      const querySnapshot = await getDocs(employeeRef);
       querySnapshot.forEach((doc: any) => {
         let tempDoc = doc.data();
         tempDoc.id = doc.id
@@ -83,7 +81,7 @@ const DashboardHR = () => {
 
   return (
     <>
-      <Container maxW='container.lg'>
+      <Container maxW='container.full'>
         <Card>
           <CardBody>
             <SimpleGrid columns={{ sm: 1, md: 2, lg: 2 }} spacing={10}>
