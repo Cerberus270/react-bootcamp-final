@@ -8,6 +8,7 @@ import Login from './components/login/Login'
 import AuthLayout from './layouts/AuthLayout'
 import MainLayout from './layouts/MainLayout'
 import DashboardHR from './components/dashboardHR/DashboardHR'
+import DashboardEmployee from './components/dashboardEmployee/DashboardEmployee'
 
 function App() {
 
@@ -29,8 +30,11 @@ function App() {
             <Route index element={<Login />} />
           </Route>
           {/* Rutas con Autenticacion */}
-          <Route path='/admin' element={<MainLayout />}>
+          <Route path='/hr' element={<MainLayout />}>
             <Route index element={<DashboardHR />} />
+          </Route>
+          <Route path='/employee' element={<MainLayout />}>
+            <Route index element={<DashboardEmployee />} />
           </Route>
         </Routes>
 

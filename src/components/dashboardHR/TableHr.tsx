@@ -1,18 +1,8 @@
 import { TableContainer, Table, TableCaption, Thead, Tr, Th, Tbody, Td, Tfoot } from '@chakra-ui/react'
 import { DocumentData, Timestamp } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { getAllSicks } from '../../utils/sdk';
+import { getAllSicks, IApplicationData } from '../../utils/sdk';
 
-interface IApplicationData {
-  employeeId: DocumentData;
-  medicalUnit: string;
-  starDate: Timestamp;
-  endDate: Timestamp;
-  doctorName: string;
-  medicalDiagnostic: string;
-  coverageDays: string;
-  id: string;
-}
 
 const TableHr = ({data}: any) => {
 

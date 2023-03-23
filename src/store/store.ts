@@ -2,7 +2,7 @@ import { create, StateCreator } from 'zustand'
 import { persist, devtools } from "zustand/middleware";
 
 export interface User {
-    idUser: string;
+    id: string;
     fullName: string;
     position: string;
     role: string;

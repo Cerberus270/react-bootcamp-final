@@ -29,7 +29,7 @@ const Login = () => {
 
     // onSubmit from Form
     const onSubmit = (data: any) => {
-        console.log(data);
+
         signInWithEmailAndPassword(auth, data.email, data.password)
             .then(async (userCredentials) => {
                 const user = userCredentials.user;
@@ -37,10 +37,10 @@ const Login = () => {
                 userInfo.email = user.email;
                 userInfo.id = user.uid; 
                 store.setUser(userInfo);
-                navigate("/admin");
+                userInfo.role === "hr_specialist" ? navigate("/hr") : navigate("/employee")
             })
             .catch((error) => {
-                alert("Error al Iniciar Sesion")
+                alert("Bad Credentials Try Again")
             });
     }
 

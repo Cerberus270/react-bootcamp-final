@@ -1,4 +1,4 @@
-import { Avatar, AvatarBadge, Box, Container, Divider, FormControl, Input, FormErrorMessage, FormLabel, SimpleGrid, Skeleton, Stack, Textarea, useDisclosure, useToast, VStack, HStack, Center } from '@chakra-ui/react';
+import { Avatar, AvatarBadge, Box, Container, Divider, FormControl, Input, FormErrorMessage, FormLabel, SimpleGrid, Textarea, useDisclosure, useToast, VStack, HStack } from '@chakra-ui/react';
 import useStore from '../../store/store'
 import {
   Card, CardBody, Text, Button,
@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form';
 import { addNewSick, getAllSicks, getEmployees, IApplicationData, IApplicationForm } from '../../utils/sdk';
 import { useEffect, useState } from 'react';
 import LogoutButton from '../LogoutButton';
+import SkeletonTable from '../SkeletonTable';
 
 const DashboardHR = () => {
 
@@ -71,9 +72,8 @@ const DashboardHR = () => {
     getData();
   }, []);
 
-  useEffect(() => {
-    console.log(store.user?.email);
-  })
+
+
 
   // onSubmit from Form
   const onSubmit = async (data: IApplicationForm) => {
@@ -115,7 +115,7 @@ const DashboardHR = () => {
                     </Avatar>
                     <LogoutButton />
                   </HStack>
-                  <Text fontSize={"sm"}>{store.user.fullName}</Text>
+                  <Text fontSize={"sm"} fontWeight={"bold"}>{store.user.fullName}</Text>
                 </VStack>
               </Box>
               <Box textAlign={{ sm: "center", md: "end", lg: "end" }}>
@@ -279,17 +279,11 @@ const DashboardHR = () => {
         {/*We pass the sickApplications to the TableHr*/}
         {
           loading ? (
-            <Stack mt={"10"}>
-              <Skeleton height='20px' />
-              <Skeleton height='20px' />
-              <Skeleton height='20px' />
-              <Skeleton height='20px' />
-              <Skeleton height='20px' />
-              <Skeleton height='20px' />
-              <Skeleton height='20px' />
-            </Stack>
+            <SkeletonTable />
           ) : (
-            <TableHr data={sickApplications} />
+            <>
+              <TableHr data={sickApplications} />
+            </>
           )
         }
 

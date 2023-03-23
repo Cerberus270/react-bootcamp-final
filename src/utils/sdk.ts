@@ -1,5 +1,5 @@
 import { signOut } from "firebase/auth";
-import { collection, addDoc, Timestamp, doc, DocumentData, getDocs, getDoc } from "firebase/firestore";
+import { collection, addDoc, Timestamp, doc, DocumentData, getDocs, getDoc, query, where } from "firebase/firestore";
 import { auth, db } from "../database/db";
 import { milisToTimeStamp } from "./utils";
 
@@ -41,7 +41,6 @@ export const addNewSick = async (data: any): Promise<boolean> => {
         tempObject.starDate = milisToTimeStamp(data.starDate);
         tempObject.endDate = milisToTimeStamp(data.endDate);
         tempObject.employeeId = doc(db, "employee", data.employeeId);
-        console.log(tempObject);
         const docRef = await addDoc(collection(db, "application"), tempObject);
         console.log("Document written with ID: ", docRef.id);
         return true;
@@ -82,7 +81,6 @@ export const getEmployees = async (): Promise<any[]> => {
 
 export const getEmployeeById = async (documentId: string): Promise<any> => {
     const docRef = doc(db, "employee", documentId); // Creating a reference to the document
-    console.log(documentId);
     const docSnap = await getDoc(docRef); // Fetching the document
     if (docSnap.exists()) {
         return docSnap.data();
@@ -106,5 +104,20 @@ export const logout = (): boolean => {
             console.log(error.message);
             control = false;
         })
-        return control;
+    return control;
+}
+
+export const getSickByEmployee = async (id: string): Promise<any[]> => {
+    let tempSick: any[] = []
+    const employeeCollection = collection(db, "application");
+    const employeeDocRef = doc(db, "employee", id);
+    const myQuery = query(employeeCollection, where("employeeId", "==", employeeDocRef));
+
+    const querySnapshot = await getDocs(myQuery);
+    querySnapshot.forEach((doc) => {
+        let tempDoc = doc.data();
+        tempDoc.id = doc.id
+        tempSick.push(tempDoc);
+    });
+    return tempSick;
 }
