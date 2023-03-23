@@ -7,16 +7,23 @@ export interface User {
     position: string;
     role: string;
     startDate: string;
+    email: string;
 }
 
 type Store = {
-    user: {};
+    user: User;
     setUser: (data: any) => void
+    reset: () => void
+}
+
+const initialState = {
+    user: {} as User
 }
 
 const userSlice: StateCreator<Store> = (set) => ({
-    user: {},
+    user: {} as User,
     setUser: (data: any) => set((state) => ({ ...state, user: data })),
+    reset: () => set(initialState)
 });
 
 const useStore = create<Store>()(

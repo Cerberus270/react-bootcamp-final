@@ -14,21 +14,10 @@ interface IApplicationData {
   id: string;
 }
 
-const TableHr = () => {
-  const [sickApplications, setSickApplication] = useState<IApplicationData[]>([]);
-  useEffect(() => {
-    const getData = async () => {
-      let sickAplicationsT: any[] = await getAllSicks();
-      if (sickAplicationsT.length > 0) {
-        setSickApplication(sickAplicationsT);
-      }
-    }
-
-    getData();
-  }, [])
+const TableHr = ({data}: any) => {
 
   return (
-    <TableContainer>
+    <TableContainer mt={'10'}>
       <Table variant='striped'>
         <Thead>
           <Tr>
@@ -43,7 +32,7 @@ const TableHr = () => {
           </Tr>
         </Thead>
         <Tbody>
-          { sickApplications.map((item, i) => (
+          { data.map((item: IApplicationData, i: any) => (
             <Tr key={i}>
               <Td>{item.id}</Td>
               <Td>{item.employeeId.id}</Td>

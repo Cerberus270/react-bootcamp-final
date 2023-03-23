@@ -13,6 +13,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../database/db";
 import useStore from "../../store/store";
 import { useNavigate } from "react-router-dom";
+import { getEmployeeById } from "../../utils/sdk";
 
 interface IFormInputs {
     email: string;
@@ -30,11 +31,12 @@ const Login = () => {
     const onSubmit = (data: any) => {
         console.log(data);
         signInWithEmailAndPassword(auth, data.email, data.password)
-            .then((userCredentials) => {
+            .then(async (userCredentials) => {
                 const user = userCredentials.user;
-                console.log(user);
-                store.setUser(user);
-                console.log("gg", store.user);
+                let userInfo = await getEmployeeById(user.uid);
+                userInfo.email = user.email;
+                userInfo.id = user.uid; 
+                store.setUser(userInfo);
                 navigate("/admin");
             })
             .catch((error) => {

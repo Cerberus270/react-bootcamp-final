@@ -1,4 +1,4 @@
-import { Box, Container, Divider, FormControl, FormErrorMessage, FormLabel, IconButton, Input, SimpleGrid, Textarea, useDisclosure, useToast } from '@chakra-ui/react';
+import { Avatar, AvatarBadge, Box, Container, Divider, FormControl, Input, FormErrorMessage, FormLabel, SimpleGrid, Skeleton, Stack, Textarea, useDisclosure, useToast, VStack, HStack, Center } from '@chakra-ui/react';
 import useStore from '../../store/store'
 import {
   Card, CardBody, Text, Button,
@@ -13,71 +13,93 @@ import {
 } from '@chakra-ui/react'
 import TableHr from './TableHr';
 import { useForm } from 'react-hook-form';
-import { addNewSick } from '../../utils/sdk';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { addNewSick, getAllSicks, getEmployees, IApplicationData, IApplicationForm } from '../../utils/sdk';
 import { useEffect, useState } from 'react';
-import { db } from '../../database/db';
-
-interface IApplicationForm {
-  employeeId: string;
-  medicalUnit: string;
-  starDate: string;
-  endDate: string;
-  doctorName: string;
-  medicalDiagnostic: string;
-  coverageDays: string;
-}
+import LogoutButton from '../LogoutButton';
 
 const DashboardHR = () => {
+
+  // Store with user info
   const store = useStore();
+
+  // States with Employees and Sick Application
   const [employees, setEmployees] = useState<any[]>([]);
+  const [sickApplications, setSickApplication] = useState<IApplicationData[]>([]);
+  // State to set skeleton
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // react-hook-form Info
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<IApplicationForm>();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
-  // onSubmit from Form
-  const onSubmit = async (data: IApplicationForm) => {
-    console.log(data);
-    await addNewSick(data) ? toast({
-      title: 'Sick Application created.',
-      description: 'Your application was saved succefully',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-      position: 'top-right'
-    }) : toast({
-      title: 'Sick Application Error.',
-      description: 'There is a error saving your application',
-      status: 'error',
-      duration: 5000,
-      isClosable: true,
-      position: 'top-right'
-    });
-    clearModal();
+  const getData = async () => {
+    setLoading(true);
+    let sickAplicationsT: any[] = await getAllSicks();
+    if (sickAplicationsT.length > 0) {
+      setSickApplication(sickAplicationsT);
+      setLoading(false);
+    } else {
+      toast({
+        title: 'Error Getting Employees.',
+        description: 'There is a error with firebase',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
   }
 
+  // Clear Form Fields and closing modal
   const clearModal = () => {
     reset();
     onClose();
   }
 
+  // useEffect to fill select with employees
   useEffect(() => {
-    const getData = async () => {
-      let tempData: any[] = []
-      const employeeRef = collection(db, "employee");
-      const querySnapshot = await getDocs(employeeRef);
-      querySnapshot.forEach((doc: any) => {
-        let tempDoc = doc.data();
-        tempDoc.id = doc.id
-        tempData.push(tempDoc);
-      });
-      setEmployees(tempData);
+    const fillSelect = async () => {
+      let tempEmployee: any[] = await getEmployees();
+      setEmployees(tempEmployee);
     }
+    fillSelect();
+  }, []);
 
+  // useEffect to fill table
+  useEffect(() => {
     getData();
-  }, [])
+  }, []);
 
+  useEffect(() => {
+    console.log(store.user?.email);
+  })
 
+  // onSubmit from Form
+  const onSubmit = async (data: IApplicationForm) => {
+    console.log(data);
+    if (await addNewSick(data)) {
+      toast({
+        title: 'Sick Application created.',
+        description: 'Your application was saved succefully',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+      getData();
+    } else {
+      toast({
+        title: 'Sick Application Error.',
+        description: 'There is a error saving your application',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      })
+    }
+    clearModal();
+  }
 
   return (
     <>
@@ -86,7 +108,15 @@ const DashboardHR = () => {
           <CardBody>
             <SimpleGrid columns={{ sm: 1, md: 2, lg: 2 }} spacing={10}>
               <Box>
-                <Text>Welcome HR Specialist</Text>
+                <VStack spacing={4} align={"flex-start"}>
+                  <HStack>
+                    <Avatar name={store.user.fullName} src='https://bit.ly/tioluwani-kolawole' >
+                      <AvatarBadge boxSize='1.25em' bg='green.500' />
+                    </Avatar>
+                    <LogoutButton />
+                  </HStack>
+                  <Text fontSize={"sm"}>{store.user.fullName}</Text>
+                </VStack>
               </Box>
               <Box textAlign={{ sm: "center", md: "end", lg: "end" }}>
                 <Button colorScheme={"blue"} size={"lg"} onClick={onOpen}>New Application</Button>
@@ -245,7 +275,23 @@ const DashboardHR = () => {
         </Card>
         <Divider />
 
-        <TableHr />
+
+        {/*We pass the sickApplications to the TableHr*/}
+        {
+          loading ? (
+            <Stack mt={"10"}>
+              <Skeleton height='20px' />
+              <Skeleton height='20px' />
+              <Skeleton height='20px' />
+              <Skeleton height='20px' />
+              <Skeleton height='20px' />
+              <Skeleton height='20px' />
+              <Skeleton height='20px' />
+            </Stack>
+          ) : (
+            <TableHr data={sickApplications} />
+          )
+        }
 
       </Container>
     </>

@@ -1,8 +1,30 @@
+import { signOut } from "firebase/auth";
 import { collection, addDoc, Timestamp, doc, DocumentData, getDocs, getDoc } from "firebase/firestore";
 import { auth, db } from "../database/db";
 import { milisToTimeStamp } from "./utils";
 
-interface IApplicationData {
+// First version
+// interface IApplicationData {
+//     employeeId: DocumentData;
+//     medicalUnit: string;
+//     starDate: Timestamp;
+//     endDate: Timestamp;
+//     doctorName: string;
+//     medicalDiagnostic: string;
+//     coverageDays: string;
+// }
+
+export interface IApplicationForm {
+    employeeId: string;
+    medicalUnit: string;
+    starDate: string;
+    endDate: string;
+    doctorName: string;
+    medicalDiagnostic: string;
+    coverageDays: string;
+}
+
+export interface IApplicationData {
     employeeId: DocumentData;
     medicalUnit: string;
     starDate: Timestamp;
@@ -10,6 +32,7 @@ interface IApplicationData {
     doctorName: string;
     medicalDiagnostic: string;
     coverageDays: string;
+    id: string;
 }
 
 export const addNewSick = async (data: any): Promise<boolean> => {
@@ -45,15 +68,43 @@ export const getAllSicks = async (): Promise<any[]> => {
     }
 }
 
-const getEmployeeName = async (id: string): Promise<any> => {
-    try {
-        const employeeRef = doc(db, "employee", id);
-        const docSnap = await getDoc(employeeRef);
-        console.log(docSnap.data()?.fullName);
-        let name: string = docSnap.data()?.fullName;
-        return name;
-    } catch (error) {
-        console.error(error);
+export const getEmployees = async (): Promise<any[]> => {
+    let tempData: any[] = []
+    const employeeRef = collection(db, "employee");
+    const querySnapshot = await getDocs(employeeRef);
+    querySnapshot.forEach((doc: any) => {
+        let tempDoc = doc.data();
+        tempDoc.id = doc.id
+        tempData.push(tempDoc);
+    });
+    return tempData;
+}
+
+export const getEmployeeById = async (documentId: string): Promise<any> => {
+    const docRef = doc(db, "employee", documentId); // Creating a reference to the document
+    console.log(documentId);
+    const docSnap = await getDoc(docRef); // Fetching the document
+    if (docSnap.exists()) {
+        return docSnap.data();
+    } else {
+        console.log("No such document!");
         return null;
     }
+}
+
+export const logout = (): boolean => {
+    // Log out the current user
+    let control: boolean = true;
+    signOut(auth)
+        .then(() => {
+            // Sign-out successful.
+            console.log('User signed out.');
+            control = true;
+        })
+        .catch((error) => {
+            // An error happened.
+            console.log(error.message);
+            control = false;
+        })
+        return control;
 }
